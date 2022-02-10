@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/TidalForces.unity
+    guid: a4ca394b750ba41b7ba592513538fa86
   m_configObjects: {}
