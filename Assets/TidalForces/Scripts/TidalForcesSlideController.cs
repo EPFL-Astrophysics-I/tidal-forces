@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 public class TidalForcesSlideController : SimulationSlideController
 {
     [Header("Visibility")]
-    public bool useEarth2D;
     public bool showGravityVectorCM;
     public bool showGravityVectors;
     public bool showInteriorVectors;
@@ -16,7 +15,6 @@ public class TidalForcesSlideController : SimulationSlideController
     public float scaleFactor = 1f;
     public int numGravityVectors = 8;
     public bool forcePointAtMoon = false;
-    //public float tidalScaleFactor = 1f;
     public int numTidalVectors = 8;
 
     [Header("Rotation")]
@@ -38,46 +36,36 @@ public class TidalForcesSlideController : SimulationSlideController
     private TidalForcesPrefabs prefabs;
 
     // Mouse clicks
-    private SphereCollider moonCollider;
     private Camera mainCamera;
+    private SphereCollider moonCollider;
     private bool clickedOnUIElement;
     private Vector3 moonStartPosition;
     private bool draggingMoon;
     private float viewportClickedX;
     private float visibleWorldX;
 
-    // To avoid calling OnEnable when first entering play mode
-    private bool canEnable;
+    private CelestialBody earth;
+    private CelestialBody moon;
 
     private void Awake()
     {
+        // Get reference to the main camera once at the start
+        mainCamera = Camera.main;
+
         // Get reference to the active simulation and prefab manager
         sim = (TidalForcesSimulation)simulation;
         if (!sim.TryGetComponent(out prefabs))
         {
-            Debug.LogWarning(transform.name + " did not find a prefab manager");
-        }
-        else
-        {
-            if (showInteriorVectors)
-            {
-                numGravityVectors *= 2;
-            }
-            prefabs.numGravityVectors = numGravityVectors;
-            prefabs.numTidalVectors = numTidalVectors;
+            Debug.LogWarning(transform.name + " > No TidalForcesPrefabs component found.");
+            return;
         }
 
-        // Get reference to the main camera once at the start
-        mainCamera = Camera.main;
-    }
-
-    private void Start()
-    {
-        // The moon should have been instantiated in TidalForcesSimulation.Awake
-        if (sim.moon)
+        if (showInteriorVectors)
         {
-            sim.moon.TryGetComponent(out moonCollider);
+            numGravityVectors *= 2;
         }
+        //prefabs.numGravityVectors = numGravityVectors;
+        //prefabs.numTidalVectors = numTidalVectors;
     }
 
     private void Update()
@@ -88,35 +76,32 @@ public class TidalForcesSlideController : SimulationSlideController
     }
 
     // Called automatically by SlideManager BEFORE OnEnable and OnDisable
-    public override void ShowAndHideUIElements()
+    public override void InitializeSlide()
     {
         if (!prefabs)
         {
             return;
         }
 
-        prefabs.SetEarthVisibility(useEarth2D);
+        // Set object visibility
         prefabs.SetGravityVectorCMVisibility(showGravityVectorCM);
         prefabs.SetGravityVectorsVisibility(showGravityVectors);
         prefabs.SetTidalVectorsVisibility(showTidalVectors);
         prefabs.SetLightsVisibility(showLights);
-    }
 
-    private void OnEnable()
-    {
-        if (!canEnable)
-        {
-            canEnable = true;
-            return;
-        }
+        // Get references for simpler code
+        earth = prefabs.earth;
+        moon = prefabs.moon;
 
-        if (sim.moon)
+        if (moon)
         {
+            moon.TryGetComponent(out moonCollider);
+
             if (sendMoonAway)
             {
                 StartCoroutine(SendMoonAway(sendMoonTo, sendTime, 0.3f));
             }
-            else if (sim.moon.Position.x < moonMinX || sim.moon.Position.x > moonMaxX)
+            else if (moon.Position.x < moonMinX || moon.Position.x > moonMaxX)
             {
                 StartCoroutine(SendMoonAway(sim.moonPosition, 1, 0));
             }
@@ -129,6 +114,9 @@ public class TidalForcesSlideController : SimulationSlideController
     private void OnDisable()
     {
         StopAllCoroutines();
+        earth = null;
+        moon = null;
+        moonCollider = null;
     }
 
     private void HandleMouseInput()
@@ -151,7 +139,7 @@ public class TidalForcesSlideController : SimulationSlideController
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             if (moonCollider.Raycast(ray, out _, 1000f))
             {
-                moonStartPosition = sim.moon.Position;
+                moonStartPosition = moon.Position;
                 viewportClickedX = mainCamera.ScreenToViewportPoint(Input.mousePosition).x;
                 visibleWorldX = Mathf.Tan(mainCamera.fieldOfView * Mathf.Deg2Rad) * mainCamera.aspect * Mathf.Abs(mainCamera.transform.position.z);
                 draggingMoon = true;
@@ -166,7 +154,7 @@ public class TidalForcesSlideController : SimulationSlideController
             float worldDeltaX = (viewportX - viewportClickedX) * visibleWorldX;
             float moonNewX = Mathf.Clamp(moonStartPosition.x + worldDeltaX, moonMinX, moonMaxX);
             Vector3 moonNewPosition = new Vector3(moonNewX, moonStartPosition.y, moonStartPosition.z);
-            sim.moon.Position = moonNewPosition;
+            moon.Position = moonNewPosition;
             UpdateGravityVectors();
             UpdateTidalVectors();
         }
@@ -180,23 +168,23 @@ public class TidalForcesSlideController : SimulationSlideController
 
     private void RotateCelestialBodies()
     {
-        if (earthIsRotating)
+        if (earthIsRotating && earth)
         {
-            sim.earth.IncrementRotation(Time.deltaTime * sim.earth.RotationPeriod * Vector3.down);
+            earth.IncrementRotation(Time.deltaTime * earth.RotationPeriod * Vector3.down);
         }
 
-        if (moonIsRotating)
+        if (moonIsRotating && moon)
         {
-            sim.moon.IncrementRotation(Time.deltaTime * sim.moon.RotationPeriod * Vector3.down);
+            moon.IncrementRotation(Time.deltaTime * moon.RotationPeriod * Vector3.down);
         }
     }
 
     private void UpdateGravityVectors(bool firstTime = false)
     {
         // Gravity vector at the center of mass
-        if (showGravityVectorCM && prefabs.gravityVectorCM != null)
+        if (showGravityVectorCM && prefabs.gravityVectorCM)
         {
-            prefabs.gravityVectorCM.SetPositions(sim.earth.Position, sim.earth.Position + GravityVector(sim.earth.Position));
+            prefabs.gravityVectorCM.SetPositions(earth.Position, earth.Position + GravityVector(earth.Position));
             prefabs.gravityVectorCM.Redraw();
         }
 
@@ -206,9 +194,9 @@ public class TidalForcesSlideController : SimulationSlideController
             // Set tail positions evenly around the earth
             if (firstTime)
             {
-                if (numGravityVectors != prefabs.numGravityVectors)
+                if (numGravityVectors != prefabs.NumGravityVectors)
                 {
-                    Debug.Log("Creating " + numGravityVectors + " new gravity vectors");
+                    //Debug.Log("Creating " + numGravityVectors + " new gravity vectors");
                     prefabs.InstantiateGravityVectors(numGravityVectors);
                 }
 
@@ -219,9 +207,9 @@ public class TidalForcesSlideController : SimulationSlideController
                         float angle = i * 360f / (numGravityVectors / 2);
                         Vector gravityVector1 = prefabs.gravityVectors[i];
                         Vector gravityVector2 = prefabs.gravityVectors[i + 1];
-                        Vector3 R = Quaternion.Euler(0, 0, angle) * (sim.earth.radius * Vector3.right);
-                        gravityVector1.TailPosition = sim.earth.Position + R;
-                        gravityVector2.TailPosition = sim.earth.Position + R / 2;
+                        Vector3 R = Quaternion.Euler(0, 0, angle) * (earth.radius * Vector3.right);
+                        gravityVector1.TailPosition = earth.Position + R;
+                        gravityVector2.TailPosition = earth.Position + R / 2;
                         gravityVector1.Redraw();
                         gravityVector2.Redraw();
                     }
@@ -232,8 +220,8 @@ public class TidalForcesSlideController : SimulationSlideController
                     {
                         float angle = i * 360f / numGravityVectors;
                         Vector gravityVector = prefabs.gravityVectors[i];
-                        Vector3 R = Quaternion.Euler(0, 0, angle) * (sim.earth.radius * Vector3.right);
-                        gravityVector.TailPosition = sim.earth.Position + R;
+                        Vector3 R = Quaternion.Euler(0, 0, angle) * (earth.radius * Vector3.right);
+                        gravityVector.TailPosition = earth.Position + R;
                         gravityVector.Redraw();
                     }
                 }
@@ -255,9 +243,9 @@ public class TidalForcesSlideController : SimulationSlideController
             // Set tail positions evenly around the earth
             if (firstTime)
             {
-                if (numTidalVectors != prefabs.numTidalVectors)
+                if (numTidalVectors != prefabs.NumTidalVectors)
                 {
-                    Debug.Log("Creating new tidal vectors");
+                    //Debug.Log("Creating new tidal vectors");
                     prefabs.InstantiateTidalVectors(numTidalVectors);
                 }
 
@@ -265,8 +253,8 @@ public class TidalForcesSlideController : SimulationSlideController
                 {
                     float angle = i * 360f / numTidalVectors;
                     Vector tidalVector = prefabs.tidalVectors[i];
-                    Vector3 R = Quaternion.Euler(0, 0, angle) * (sim.earth.radius * Vector3.right);
-                    tidalVector.TailPosition = sim.earth.Position + R;
+                    Vector3 R = Quaternion.Euler(0, 0, angle) * (earth.radius * Vector3.right);
+                    tidalVector.TailPosition = earth.Position + R;
                     tidalVector.Redraw();
                 }
             }
@@ -282,24 +270,24 @@ public class TidalForcesSlideController : SimulationSlideController
 
     private Vector3 GravityVector(Vector3 position)
     {
-        Vector3 r = sim.moon.Position - sim.earth.Position;
-        Vector3 gAtCM = scaleFactor * sim.NewtonG * sim.moon.Mass / Mathf.Log10(r.magnitude) * r.normalized;
+        Vector3 r = moon.Position - earth.Position;
+        Vector3 gAtCM = scaleFactor * sim.NewtonG * moon.Mass / Mathf.Log10(r.magnitude) * r.normalized;
         Vector3 gAtP = gAtCM + TidalVector(position);
         if (forcePointAtMoon)
         {
             // Actually point the vector at the moon
-            gAtP = gAtP.magnitude * (sim.moon.Position - position).normalized;
+            gAtP = gAtP.magnitude * (moon.Position - position).normalized;
         }
         return gAtP;
     }
 
     private Vector3 TidalVector(Vector3 position)
     {
-        Vector3 r = sim.moon.Position - position;
-        Vector3 R = position - sim.earth.Position;
+        Vector3 r = moon.Position - position;
+        Vector3 R = position - earth.Position;
         float theta = Mathf.Atan2(R.y, R.x);
-        float magnitudeAtCM = scaleFactor * sim.NewtonG * sim.moon.Mass / Mathf.Log10((r + R).magnitude);
-        float tidalMagnitude = 0.25f * (R.magnitude / sim.earth.radius) * magnitudeAtCM;
+        float magnitudeAtCM = scaleFactor * sim.NewtonG * moon.Mass / Mathf.Log10((r + R).magnitude);
+        float tidalMagnitude = 0.25f * (R.magnitude / earth.radius) * magnitudeAtCM;
         return tidalMagnitude * new Vector3(2 * Mathf.Cos(theta), -Mathf.Sin(theta), 0);
     }
 
@@ -312,14 +300,14 @@ public class TidalForcesSlideController : SimulationSlideController
         moonIsDraggable = false;
 
         float time = 0;
-        moonStartPosition = sim.moon.Position;
+        moonStartPosition = moon.Position;
 
         while (time < moveTime)
         {
             time += Time.deltaTime;
             float t = time / moveTime;
             t = t * t * (3f - (2f * t));
-            sim.moon.Position = Vector3.Lerp(moonStartPosition, targetPosition, t);
+            moon.Position = Vector3.Lerp(moonStartPosition, targetPosition, t);
             UpdateGravityVectors();
             UpdateTidalVectors();
             yield return null;

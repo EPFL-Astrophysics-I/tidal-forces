@@ -19,9 +19,6 @@ public class TidalForcesSimulation : Simulation
     public Vector3 moonPosition = Vector3.right;
 
     private TidalForcesPrefabs prefabs;
-    [HideInInspector] public CelestialBody earth;
-    [HideInInspector] public Transform earth2D;
-    [HideInInspector] public CelestialBody moon;
 
     // Gravitational constant
     private float _newtonG;
@@ -35,13 +32,8 @@ public class TidalForcesSimulation : Simulation
             return;
         }
 
-        prefabs.InstantiatePrefabs();
-
-        earth = prefabs.earth;
-        earth2D = prefabs.earth2D;
-        moon = prefabs.moon;
-
         // Create CelestialBodies and assign their properties
+        prefabs.InstantiatePrefabs();
         Reset();
 
         // Compute Newton's constant only once
@@ -50,6 +42,7 @@ public class TidalForcesSimulation : Simulation
 
     public override void Reset()
     {
+        CelestialBody earth = prefabs.earth;
         if (earth)
         {
             earth.Position = earthPosition;
@@ -59,12 +52,14 @@ public class TidalForcesSimulation : Simulation
             earth.RotationPeriod = 2;
         }
 
+        Transform earth2D = prefabs.earth2D;
         if (earth2D)
         {
             earth2D.transform.position = earthPosition;
             earth2D.transform.localScale = 2 * earthRadius * Vector3.one;
         }
 
+        CelestialBody moon = prefabs.moon;
         if (moon)
         {
             moon.Position = moonPosition;

@@ -12,34 +12,18 @@ public class TidalForcesPrefabs : MonoBehaviour
     public GameObject tidalVectorPrefab;      // Tidal force vector
     public List<GameObject> lightPrefabs;
 
-    public CelestialBody earth;
-    public Transform earth2D;
-    public CelestialBody moon;
+    [HideInInspector] public CelestialBody earth;
+    [HideInInspector] public Transform earth2D;
+    [HideInInspector] public CelestialBody moon;
 
-    // Parameters set by TidalForcesSlideController.Awake
-    [HideInInspector] public int numGravityVectors;
-    [HideInInspector] public int numTidalVectors;
+    public int NumGravityVectors { get; private set; } = 0;
+    public int NumTidalVectors { get; private set; } = 0;
 
     // Actual instance references
     [HideInInspector] public Vector gravityVectorCM;
     [HideInInspector] public List<Vector> gravityVectors;
     [HideInInspector] public List<Vector> tidalVectors;
     [HideInInspector] public List<Light> lights;
-
-    private void Start()
-    {
-        // The idea here is to instantiate all assigned prefabs at the start
-        // and then let the SlideController control each gameObject's visibility;
-        // Each simulation owns its set of instantiated gameObjects, and multiple
-        // slides can have access to them;
-        // Prefabs that are not assigned in the inspector cannot be instantiated
-        //InstantiatePrefabs();
-
-        // Need to force reset here to make sure no residual values are lingering
-        // due to the variables being hidden but public
-        numGravityVectors = 0;
-        numTidalVectors = 0;
-    }
 
     public void InstantiatePrefabs()
     {
@@ -69,10 +53,14 @@ public class TidalForcesPrefabs : MonoBehaviour
             go.name = "Moon";
         }
 
-        if (gravityVectorCMPrefab != null)
+        if (gravityVectorCMPrefab)
         {
-            gravityVectorCM = Instantiate(gravityVectorCMPrefab, transform).GetComponent<Vector>();
-            gravityVectorCM.name = "Gravity Vector CM";
+            GameObject go = Instantiate(gravityVectorCMPrefab, transform);
+            if (!go.transform.TryGetComponent(out gravityVectorCM))
+            {
+                Debug.LogWarning(go.name + " does not have a Vector component");
+            }
+            go.name = "Gravity Vector CM";
         }
 
         foreach (GameObject lightPrefab in lightPrefabs)
@@ -84,57 +72,61 @@ public class TidalForcesPrefabs : MonoBehaviour
 
     public void InstantiateGravityVectors(int numVectors)
     {
-        if (gravityVectorPrefab != null)
+        if (!gravityVectorPrefab)
         {
-            // Clear out any previous gravity vectors
-            foreach (Vector gravityVector in gravityVectors)
-            {
-                Destroy(gravityVector.gameObject);
-            }
-
-            // Start with a clean slate
-            gravityVectors = new List<Vector>();
-
-            // Create the new gravity vectors
-            for (int i = 0; i < numVectors; i++)
-            {
-                Vector gravityVector = Instantiate(gravityVectorPrefab, transform).GetComponent<Vector>();
-                gravityVectors.Add(gravityVector);
-                gravityVector.name = "Gravity Vector " + i;
-            }
-
-            numGravityVectors = numVectors;
+            return;
         }
+
+        // Clear out any previous gravity vectors
+        foreach (Vector gravityVector in gravityVectors)
+        {
+            Destroy(gravityVector.gameObject);
+        }
+
+        // Start with a clean slate
+        gravityVectors = new List<Vector>();
+
+        // Create the new gravity vectors
+        for (int i = 0; i < numVectors; i++)
+        {
+            Vector gravityVector = Instantiate(gravityVectorPrefab, transform).GetComponent<Vector>();
+            gravityVectors.Add(gravityVector);
+            gravityVector.name = "Gravity Vector " + i;
+        }
+
+        NumGravityVectors = numVectors;
     }
 
     public void InstantiateTidalVectors(int numVectors)
     {
-        if (tidalVectorPrefab != null)
+        if (!tidalVectorPrefab)
         {
-            // Clear out any previous tidal vectors
-            foreach (Vector tidalVector in tidalVectors)
-            {
-                Destroy(tidalVector.gameObject);
-            }
-
-            // Start with a clean slate
-            tidalVectors = new List<Vector>();
-
-            // Create the new tidal vectors
-            for (int i = 0; i < numVectors; i++)
-            {
-                Vector tidalVector = Instantiate(tidalVectorPrefab, transform).GetComponent<Vector>();
-                tidalVectors.Add(tidalVector);
-                tidalVector.name = "Tidal Vector " + i;
-            }
-
-            numTidalVectors = numVectors;
+            return;
         }
+
+        // Clear out any previous tidal vectors
+        foreach (Vector tidalVector in tidalVectors)
+        {
+            Destroy(tidalVector.gameObject);
+        }
+
+        // Start with a clean slate
+        tidalVectors = new List<Vector>();
+
+        // Create the new tidal vectors
+        for (int i = 0; i < numVectors; i++)
+        {
+            Vector tidalVector = Instantiate(tidalVectorPrefab, transform).GetComponent<Vector>();
+            tidalVectors.Add(tidalVector);
+            tidalVector.name = "Tidal Vector " + i;
+        }
+
+        NumTidalVectors = numVectors;
     }
 
     public void SetGravityVectorCMVisibility(bool visible)
     {
-        if (gravityVectorCM != null)
+        if (gravityVectorCM)
         {
             gravityVectorCM.gameObject.SetActive(visible);
         }
@@ -171,7 +163,7 @@ public class TidalForcesPrefabs : MonoBehaviour
             earth.gameObject.SetActive(!use2D);
         }
 
-        if (earth2D != null)
+        if (earth2D)
         {
             earth2D.gameObject.SetActive(use2D);
         }

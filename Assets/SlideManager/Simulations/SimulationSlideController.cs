@@ -18,7 +18,7 @@ public abstract class SimulationSlideController : MonoBehaviour
         if (!simulation.gameObject.activeInHierarchy)
         {
             simulation.gameObject.SetActive(true);
-            ShowAndHideUIElements();
+            InitializeSlide();
 
             if (autoPlay)
             {
@@ -45,8 +45,8 @@ public abstract class SimulationSlideController : MonoBehaviour
         }
     }
 
-    public virtual void ShowAndHideUIElements()
+    public virtual void InitializeSlide()
     {
-        Debug.LogWarning(transform.name + " has not defined ShowAndHideUIElements()");
+        Debug.LogWarning(transform.name + " has not defined InitializeSlide()");
     }
 }
