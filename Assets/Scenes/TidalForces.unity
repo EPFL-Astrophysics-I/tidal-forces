@@ -3504,7 +3504,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &868889438
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3543,10 +3543,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Since the real Earth completes one rotation about its axis per day, we
-    experience a high (or low) ocean tide approximately every 12 hours 25 minutes.
-    That's because it takes about 24 hours 50 minutes for the Moon to arrive back
-    at the same point overhead in our sky.
+  m_text: As the real Earth completes one rotation about its axis per day, we experience
+    a high (or low) ocean tide approximately every 12 hours 25 minutes. That's because
+    it takes about 24 hours 50 minutes for the Moon to arrive back at the same point
+    overhead in our sky.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 350cfcf20da78478f9197161ac83b480, type: 2}
   m_sharedMaterial: {fileID: -1129015340585624399, guid: 350cfcf20da78478f9197161ac83b480,
@@ -3556,7 +3556,7 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
+    rgba: 4294967295
   m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
@@ -4171,7 +4171,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1000067160}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
@@ -4651,7 +4651,7 @@ MonoBehaviour:
   m_text: 'Despite appearances, the Earth is not a perfect sphere. There are multiple
     reasons for this, including the fact that the Earth is rotating about its own
     axis, causing it to bulge slightly around the equator. But this effect of rotation
-    is self-generated and thus doesn''t depend the presence of other massive bodies
+    is self-generated and thus doesn''t depend on the presence of other massive bodies
     like the Sun and the Moon.
 
 '
@@ -5013,10 +5013,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "Using the coordinate system shown here, in the limit that\n              
-    (the Moon is very far away), one can derive the approximation here. Notice how
-    the magnitude and direction of the tidal force are symmetric with respect to
-    Earth\u2019s center. "
+  m_text: "Using the coordinate system shown, we can derive the following approximation
+    in the limit that                   (that is, the Moon is very far away). Notice
+    how the magnitude and direction of the tidal force are symmetric with respect
+    to Earth\u2019s center. "
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 350cfcf20da78478f9197161ac83b480, type: 2}
   m_sharedMaterial: {fileID: -1129015340585624399, guid: 350cfcf20da78478f9197161ac83b480,
@@ -5977,7 +5977,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1342210789
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9423,7 +9423,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -47.4}
+  m_AnchoredPosition: {x: 109.1, y: -69.9}
   m_SizeDelta: {x: 560, y: 144}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1990181109
