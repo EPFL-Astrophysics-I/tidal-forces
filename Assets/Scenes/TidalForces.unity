@@ -2361,7 +2361,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &489827823
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2403,7 +2403,9 @@ MonoBehaviour:
   m_text: "Les forces de mar\xE9e sont omnipr\xE9sentes dans le syst\xE8me solaire,
     voire dans tout l'univers. La Lune subit \xE9galement des distorsions dues \xE0
     la gravit\xE9 de la Terre, et toutes deux subissent \xE0 leur tour les forces
-    de mar\xE9e du Soleil, bien que dans une moindre mesure."
+    de mar\xE9e du Soleil, bien que dans une moindre mesure. Les anneaux plan\xE9taires
+    existent grace aux forces de mar\xE9e, ce que nous explorerons dans la prochaine
+    app."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 350cfcf20da78478f9197161ac83b480, type: 2}
   m_sharedMaterial: {fileID: -1129015340585624399, guid: 350cfcf20da78478f9197161ac83b480,
@@ -2665,7 +2667,7 @@ RectTransform:
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: -100, y: 0}
-  m_SizeDelta: {x: 240, y: 0}
+  m_SizeDelta: {x: 235, y: 0}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!1 &656279554
 GameObject:
@@ -4469,7 +4471,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1077713668
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4509,9 +4511,10 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_text: "Tidal forces are ubiquitous throughout the solar system, not to mention
-    the whole universe. The Moon also experiences tidal shape distortions due to
-    Earth\u2019s gravity, which both in turn experience tidal forces from the Sun,
-    although to a lesser extent."
+    the whole universe. Indeed, the Moon also experiences tidal shape distortions
+    due to Earth\u2019s gravity, which both in turn feel tidal forces from the Sun,
+    although to a lesser extent. Planetary rings are a result of tidal forces, which
+    we explore in the next app."
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 350cfcf20da78478f9197161ac83b480, type: 2}
   m_sharedMaterial: {fileID: -1129015340585624399, guid: 350cfcf20da78478f9197161ac83b480,
@@ -8580,7 +8583,7 @@ CanvasGroup:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1903281742}
   m_Enabled: 1
-  m_Alpha: 0
+  m_Alpha: 1
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
